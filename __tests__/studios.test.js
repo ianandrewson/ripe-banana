@@ -38,8 +38,7 @@ describe('studio route tests', () => {
             _id: expect.any(String),
             city: 'Universal City',
             state: 'California',
-            country: 'United States',
-            __v: 0
+            country: 'United States'
           },
           __v: 0
         });
@@ -65,8 +64,7 @@ describe('studio route tests', () => {
             _id: expect.any(String),
             city: 'Universal City', 
             state: 'California', 
-            country: 'United States',
-            __v: 0
+            country: 'United States'
           },
           __v: 0
         });
