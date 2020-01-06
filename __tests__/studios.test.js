@@ -83,8 +83,7 @@ describe('studio route tests', () => {
         studios.forEach(studio => {
           expect(res.body).toContainEqual({
             _id: studio._id.toString(),
-            name: studio.name,
-            __v: 0
+            name: studio.name
           });
         });
       });
