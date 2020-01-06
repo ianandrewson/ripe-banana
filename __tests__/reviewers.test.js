@@ -108,7 +108,7 @@ describe('reviewer routes tests', () => {
       });
   });
 
-  it.skip('should throw an error if attempting to delete a reviewer if they have no reviews', () => {
+  it.skip('should throw an error if attempting to delete a reviewer with reviews', () => {
 
   });
 
