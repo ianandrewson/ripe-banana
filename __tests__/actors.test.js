@@ -25,19 +25,15 @@ describe('actor routes tests', () => {
   });
 
   it('should be able to post a new actor', async() => {
-    let date = new Date('4/16/1889')
-    const actor = await Actor.create({
-      name: 'Charlie Chaplin',
-      dob: date,
-      pob: 'London, England'
-    });
+    let date = new Date('4/16/1889');
     return request(app)
       .post('/api/v1/actors')
+      .send({ name: 'Charlie Chaplin', dob: date, pob: 'London, England' })
       .then(res => {
         expect(res.body).toEqual({
-          _id: actor._id.toString(),
+          _id: expect.any(String),
           name: 'Charlie Chaplin',
-          dob: date,
+          dob: date.toISOString(),
           pob: 'London, England',
           __v: 0
         });
@@ -58,7 +54,7 @@ describe('actor routes tests', () => {
         expect(res.body).toEqual({
           _id: actor._id.toString(),
           name: 'Charlie Chaplin',
-          dob: date,
+          dob: date.toISOString(),
           pob: 'London, England',
           __v: 0
         });
@@ -70,7 +66,7 @@ describe('actor routes tests', () => {
     const date2 = new Date('1/5/1975');
     const date3 = new Date('5/23/1964');
     const actors = await Actor.create([
-      { name: 'Some Dude', dob: date1, pob: 'Copenhagen, Denmark'},
+      { name: 'Some Dude', dob: date1, pob: 'Copenhagen, Denmark' },
       { name: 'Other Person', dob: date2, pob: 'Nome, Alaska' },
       { name: 'A Fair lady', dob: date3, pob: 'Portland, Oregon' }
     ]);
@@ -80,10 +76,7 @@ describe('actor routes tests', () => {
         actors.forEach(actor => {
           expect(res.body).toContainEqual({
             _id: actor._id.toString(),
-            name: actor.name,
-            dob: actor.dob,
-            pob: actor.lob,
-            __v: 0
+            name: actor.name
           });
         });
       });
