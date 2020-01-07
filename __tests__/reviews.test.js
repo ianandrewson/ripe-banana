@@ -34,7 +34,6 @@ describe('review route tests', () => {
           expect(res.body).toContainEqual({
             _id: review._id.toString(),
             rating: review.rating,
-            reviewer: review.reviewer.toString(),
             review: review.review,
             film: review.film.toString()
           });
