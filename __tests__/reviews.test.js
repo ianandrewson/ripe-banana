@@ -4,8 +4,9 @@ const app = require('../lib/app.js');
 const connect = require('../lib/utils/connect.js');
 const mongoose = require('mongoose');
 const Review = require('../lib/models/Review.js');
-
-//getAll, limit to 100
+const Film = require('../lib/models/Film.js');
+const Studio = require('../lib/models/Studio.js');
+const Reviewer = require('../lib/models/Reviewer.js');
 
 describe('review route tests', () => {
   
@@ -17,15 +18,35 @@ describe('review route tests', () => {
     return mongoose.connection.dropDatabase();
   });
 
+  let studio;
+  let film;
+  let reviewer;
+  beforeEach(async() => {
+    studio = await Studio.create({
+      name: 'Universal Studios'
+    });
+
+    film = await Film.create({
+      title: 'Moon',
+      studio,
+      released: '2009'
+    });
+
+    reviewer = await Reviewer.create({
+      name: 'Yuri',
+      company: 'Critico'
+    });
+  });
+
   afterAll(() => {
     return mongoose.connection.close();
   });
   
   it('should be able to get all reviews', async() => {
     const reviews = await Review.create([
-      { rating: 4, reviewer: new mongoose.Types.ObjectId(), review: 'yay', film: new mongoose.Types.ObjectId() },
-      { rating: 3, reviewer: new mongoose.Types.ObjectId(), review: 'Ok', film: new mongoose.Types.ObjectId() },
-      { rating: 2, reviewer: new mongoose.Types.ObjectId(), review: 'meh', film: new mongoose.Types.ObjectId() }
+      { rating: 4, reviewer, review: 'yay', film },
+      { rating: 3, reviewer, review: 'Ok', film },
+      { rating: 2, reviewer, review: 'meh', film }
     ]);
     return request(app)
       .get('/api/v1/reviews')
@@ -35,7 +56,7 @@ describe('review route tests', () => {
             _id: review._id.toString(),
             rating: review.rating,
             review: review.review,
-            film: review.film.toString()
+            film: { _id: review.film._id.toString(), title: review.film.title }
           });
         });
       });
