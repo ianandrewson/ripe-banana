@@ -11,7 +11,7 @@ describe('reviewer routes tests', () => {
     connect();
   });
 
-  beforeAll(() => {
+  beforeEach(() => {
     return mongoose.connection.dropDatabase();
   });
 
