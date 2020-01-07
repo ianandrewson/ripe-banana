@@ -40,4 +40,25 @@ describe('review route tests', () => {
         });
       });
   });
+
+  it('should be able to delete a review by ID', async() => {
+    const review = await Review.create({
+      rating: 5,
+      reviewer: new mongoose.Types.ObjectId(),
+      review: 'hella good',
+      film: new mongoose.Types.ObjectId()
+    });
+    return request(app)
+      .delete(`/api/v1/reviews/${review._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: review._id.toString(),
+          rating: 5,
+          reviewer: review.reviewer.toString(),
+          review: 'hella good',
+          film: review.film.toString(),
+          __v: 0
+        });
+      });
+  });
 });
