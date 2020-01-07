@@ -53,10 +53,9 @@ describe('actor routes tests', () => {
 
     const studio = await Studio.create({
       name: 'Universal Studios'
-    })
+    });
 
-    const id: films = await Film.create[0]._id.toString(), 'Moon'([,
-
+    const films = await Film.create([
       { title: 'Moon', studio, relased: 2009, cast: [actor] },
       { title: 'Sol', studio, released: 2002, cast: [actor] }
     ]);
