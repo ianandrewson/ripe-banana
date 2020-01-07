@@ -4,6 +4,8 @@ const request = require('supertest');
 const app = require('../lib/app.js');
 const mongoose = require('mongoose');
 const Actor = require('../lib/models/Actor.js');
+const Film = require('../lib/models/Film.js');
+const Studio = require('../lib/models/Studio.js');
 
 //get: _id, name
 //get/:id: name, dob, pob, films: [{ id, title, released }]
@@ -48,6 +50,17 @@ describe('actor routes tests', () => {
       dob: date,
       pob: 'London, England'
     });
+
+    const studio = await Studio.create({
+      name: 'Universal Studios'
+    })
+
+    const id: films = await Film.create[0]._id.toString(), 'Moon'([,
+
+      { title: 'Moon', studio, relased: 2009, cast: [actor] },
+      { title: 'Sol', studio, released: 2002, cast: [actor] }
+    ]);
+
     return request(app)
       .get(`/api/v1/actors/${actor._id}`)
       .then(res => {
@@ -56,6 +69,10 @@ describe('actor routes tests', () => {
           name: 'Charlie Chaplin',
           dob: date.toISOString(),
           pob: 'London, England',
+          films: [
+            { _id: films[0]._id.toString(), title: 'Moon' },
+            { _id: films[1]._id.toString(), title: 'Sol' }
+          ],
           __v: 0
         });
       });
