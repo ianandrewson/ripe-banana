@@ -38,15 +38,16 @@ describe('film routes tests', () => {
       .post('/api/v1/films')
       .send({
         title: 'Moon',
-        studio: studio,
+        studio,
         released: 2009
       })
       .then(res => {
         expect(res.body).toEqual({
-          _id: expect.any(mongoose.Types.ObjectId),
+          _id: expect.any(String),
           title: 'Moon',
-          studio: { _id: studio._id, name: studio.name, __v: 0 },
+          studio: studio._id.toString(),
           released: 2009,
+          cast: [],
           __v: 0
         });
       });
@@ -63,10 +64,12 @@ describe('film routes tests', () => {
       .get(`/api/v1/films/${film.id}`)
       .then(res => {
         expect(res.body).toEqual({
-          _id: film._id,
+          _id: film._id.toString(),
           title: 'Moon',
-          studio: { _id: studio._id, name: studio.name, __v: 0 },
+          studio: { _id: studio._id.toString(), name: studio.name },
           released: 2009,
+          cast: [],
+          __v: 0
         });
       });
   });
@@ -82,9 +85,9 @@ describe('film routes tests', () => {
       .then(res => {
         films.forEach(film => {
           expect(res.body).toContainEqual({
-            _id: film._id,
+            _id: film._id.toString(),
             title: film.title,
-            studio: { _id: studio._id, name: studio.name, __v: 0 },
+            studio: { _id: studio._id.toString(), name: studio.name },
             released: film.released,
             __v: 0
           });
