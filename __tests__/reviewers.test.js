@@ -1,9 +1,13 @@
 require('dotenv').config();
 const request = require('supertest');
 const app = require('../lib/app.js');
-const Reviewer = require('../lib/models/Reviewer.js');
 const mongoose = require('mongoose');
 const connect = require('../lib/utils/connect.js');
+const Reviewer = require('../lib/models/Reviewer.js');
+const Review = require('../lib/models/Review.js');
+const Film = require('../lib/models/Film.js');
+const Studio = require('../lib/models/Studio.js');
+
 
 describe('reviewer routes tests', () => {
 
@@ -41,6 +45,24 @@ describe('reviewer routes tests', () => {
       name: 'Burt',
       company: 'Review Co'
     });
+
+    const studio = await Studio.create({
+      name: 'Universal Studios'
+    });
+
+    const film = await Film.create({
+      title: 'Moon',
+      studio,
+      released: 2009
+    });
+
+    const review = await Review.create({
+      rating: 5,
+      reviewer,
+      review: 'Hella good',
+      film
+    });
+
     return request(app)
       .get(`/api/v1/reviewers/${reviewer._id}`)
       .then(res => {
@@ -48,6 +70,15 @@ describe('reviewer routes tests', () => {
           _id: expect.any(String),
           name: 'Burt',
           company: 'Review Co',
+          reviews: [{
+            _id: review._id.toString(),
+            rating: review.rating,
+            review: review.review,
+            film: {
+              _id: film._id.toString(),
+              title: film.title
+            }
+          }],
           __v: 0
         });
       });
