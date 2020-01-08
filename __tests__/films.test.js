@@ -5,12 +5,9 @@ const app = require('../lib/app.js');
 const mongoose = require('mongoose');
 const Film = require('../lib/models/Film.js');
 const Studio = require('../lib/models/Studio.js');
+const Review = require('../lib/models/Review.js');
+const Reviewer = require('../lib/models/Reviewer.js');
 
-//get films: id, title, released, studio: { id, name}
-
-//get film:id : title, released, studio: {id, name}, cast: [{id, role, actor}], reviews: {id, rating, review, reviewer: { id, name}}
-
-//post
 
 describe('film routes tests', () => {
 
@@ -60,6 +57,19 @@ describe('film routes tests', () => {
       studio: studio,
       released: 2009
     });
+
+    const reviewer = await Reviewer.create({
+      name: 'Bob',
+      company: 'Critico'
+    });
+
+    const review = await Review.create({
+      rating: 5,
+      reviewer,
+      review: 'Two thumbs up',
+      film
+    });
+
     return request(app)
       .get(`/api/v1/films/${film.id}`)
       .then(res => {
@@ -69,6 +79,15 @@ describe('film routes tests', () => {
           studio: { _id: studio._id.toString(), name: studio.name },
           released: 2009,
           cast: [],
+          reviews: [{
+            _id: review._id.toString(),
+            rating: 5,
+            review: review.review,
+            reviewer: {
+              _id: reviewer._id.toString(),
+              name: 'Bob'
+            }
+          }],
           __v: 0
         });
       });
