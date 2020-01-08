@@ -139,9 +139,33 @@ describe('reviewer routes tests', () => {
       });
   });
 
-  it.skip('should throw an error if attempting to delete a reviewer with reviews', () => {
+  it('should throw an error if attempting to delete a reviewer with reviews', async() => {
+    const reviewer = await Reviewer.create({
+      name: 'Burt',
+      company: 'Review Co'
+    });
 
+    const studio = await Studio.create({
+      name: 'Universal Studios'
+    });
+
+    const film = await Film.create({
+      title: 'Moon',
+      studio,
+      released: 2009
+    });
+
+    await Review.create({
+      rating: 5,
+      reviewer,
+      review: 'Hella good',
+      film
+    });
+    return request(app)
+      .delete(`/api/v1/reviewers/${reviewer._id}`)
+      .then(res => {
+        expect(res.body.message).toEqual('Unable to delete reviewer: has reviews.');
+      });
   });
-
 });
 
