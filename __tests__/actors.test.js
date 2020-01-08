@@ -56,8 +56,8 @@ describe('actor routes tests', () => {
     });
 
     const films = await Film.create([
-      { title: 'Moon', studio, relased: 2009, cast: [actor] },
-      { title: 'Sol', studio, released: 2002, cast: [actor] }
+      { title: 'Moon', studio, released: 2009, cast: [{ actor }] },
+      { title: 'Sol', studio, released: 2002, cast: [{ actor }] }
     ]);
 
     return request(app)
@@ -69,8 +69,8 @@ describe('actor routes tests', () => {
           dob: date.toISOString(),
           pob: 'London, England',
           films: [
-            { _id: films[0]._id.toString(), title: 'Moon' },
-            { _id: films[1]._id.toString(), title: 'Sol' }
+            { _id: films[0]._id.toString(), title: films[0].title, released: films[0].released },
+            { _id: films[1]._id.toString(), title: films[1].title, released: films[1].released }
           ],
           __v: 0
         });
