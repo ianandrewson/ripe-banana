@@ -1,36 +1,12 @@
-require('dotenv').config();
-const connect = require('../lib/utils/connect.js');
+const { getFilm, getFilms } = require('../lib/helpers/data-helper.js');
+
 const request = require('supertest');
 const app = require('../lib/app.js');
 const mongoose = require('mongoose');
-const Film = require('../lib/models/Film.js');
-const Studio = require('../lib/models/Studio.js');
-const Review = require('../lib/models/Review.js');
-const Reviewer = require('../lib/models/Reviewer.js');
 
-
-describe('film routes tests', () => {
-
-  beforeAll(() => {
-    connect();
-  });
-
-  beforeEach(() => {
-    return mongoose.connection.dropDatabase();
-  });
-
-  let studio;
-  beforeEach(async() => {
-    studio = await Studio.create({
-      name: 'Universal Studios'
-    });
-  });
-
-  afterAll(() => {
-    return mongoose.connection.close();
-  });
-
-  it('can post a new film', () => {
+describe('films route tests', () => {
+  it('can post a new film', async() => {
+    const studio = new mongoose.Types.ObjectId();
     return request(app)
       .post('/api/v1/films')
       .send({
@@ -50,66 +26,47 @@ describe('film routes tests', () => {
       });
   });
 
-  //need to update to have reviews virtual: {id, rating review, reviewer: {id, name}}
   it('can get a film by ID', async() => {
-    const film = await Film.create({
-      title: 'Moon',
-      studio: studio,
-      released: 2009
-    });
-
-    const reviewer = await Reviewer.create({
-      name: 'Bob',
-      company: 'Critico'
-    });
-
-    const review = await Review.create({
-      rating: 5,
-      reviewer,
-      review: 'Two thumbs up',
-      film
-    });
+    const film = await getFilm();
 
     return request(app)
-      .get(`/api/v1/films/${film.id}`)
+      .get(`/api/v1/films/${film._id}`)
       .then(res => {
-        expect(res.body).toEqual({
-          _id: film._id.toString(),
-          title: 'Moon',
-          studio: { _id: studio._id.toString(), name: studio.name },
-          released: 2009,
-          cast: [],
-          reviews: [{
-            _id: review._id.toString(),
-            rating: 5,
-            review: review.review,
+        expect(res.body).toEqual(
+          expect.objectContaining({ ...film, studio: {
+            _id: expect.any(String),
+            name: expect.any(String)
+          } })
+        );
+        res.body.reviews.forEach(review => {
+          expect(review).toEqual({
+            _id: expect.any(String),
+            rating: expect.any(Number),
+            review: expect.any(String),
             reviewer: {
-              _id: reviewer._id.toString(),
-              name: 'Bob'
+              _id: expect.any(String),
+              name: expect.any(String)
             }
-          }],
-          __v: 0
+          });
         });
       });
   });
 
   it('can get all films', async() => {
-    const films = await Film.create([
-      { title: 'Moon', studio, released: 2009 },
-      { title: 'Planet Earth', studio, released: 2010 },
-      { title: 'Sol', studio, released: 2000 }
-    ]);
+    await getFilms();
     return request(app)
       .get('/api/v1/films')
       .then(res => {
-        films.forEach(film => {
-          expect(res.body).toContainEqual({
-            _id: film._id.toString(),
-            title: film.title,
-            studio: { _id: studio._id.toString(), name: studio.name },
-            released: film.released,
-            __v: 0
-          });
+        res.body.forEach(film => {
+          expect(film).toEqual(
+            expect.objectContaining({
+              _id: film._id,
+              title: film.title,
+              released: film.released,
+              studio: { _id: film.studio._id, name: film.studio.name },
+              __v: 0,
+            })
+          );
         });
       });
   });
